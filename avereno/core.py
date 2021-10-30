@@ -11,7 +11,7 @@ T = TypeVar("T")
 
 
 def retry(
-    unreliable_function: Callable[..., T],
+    unreliable_function: Callable[[], T],
     max_retries=5,
     max_sleep=timedelta(minutes=10),
     on_retry: Callable[[int, Exception], None] = (
