@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+    if: github.event.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_TOKEN_FOR_CONVENTIONAL_CHANGELOG }}
+
+    #######################################################
+    ############## DETERMINE NEXT VERSION #################
+    #######################################################
+
+    # conventional-ch increments the patch version even when
+    # it skipped commiting due to empty changelog. In such a case,
+    # we have to retrieve the old (unchanged) version using our own means.
+    # https://github.com/conventional-changelog/standard-version/issues/730
+
+    - name: Read old version file
+      id: read-old-version
+      uses: CumulusDS/get-yaml-paths-action@v0.1.0
+      with:
+        file: version.yml
+        version: version
+    - name: Conventional changelog
+      id: conventional-ch
+      uses: TriPSs/conventional-changelog-action@v3
+      with:
+        github-token: ${{ secrets.GH_TOKEN_FOR_CONVENTIONAL_CHANGELOG }}
+        release-count: '10'
+        version-file: './version.yml'
+        git-message: 'release: {version}'
+        version-path: 'version'
+        skip-on-empty: 'true'
+        skip-version-file: 'false'
+        skip-commit: 'false'
+    - name: Read new version file
+      id: read-new-version
+      uses: CumulusDS/get-yaml-paths-action@v0.1.0
+      with:
+        file: version.yml
+        version: version
+    - name: Put correct version into GITHUB_ENV and into version.yml
+      run: |
+        if ${{ steps.conventional-ch.outputs.skipped == 'false' }}; then
+          echo "nxc_version=${{ steps.read-new-version.outputs.version }}" >> $GITHUB_ENV
+        else
+          echo "nxc_version=${{ steps.read-old-version.outputs.version }}" >> $GITHUB_ENV
+          git checkout -- version.yml
+        fi
+
+
+    #######################################################
+    ################ RELEASE TO PYPI ######################
+    #######################################################
+
+    # TODO
