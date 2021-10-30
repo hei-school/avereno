@@ -1,0 +1,28 @@
+name: CI
+on:
+  push:
+    branch:
+      - '*'
+  workflow_dispatch:
+
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -s -v --cov=avereno --cov-fail-under=95
+
+  black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - run: pip install black
+      - run: black --check .
