@@ -20,6 +20,21 @@ def retry(
     init_backoff=timedelta(seconds=1),
     backoff_multiplier=2,
 ) -> T:
+    """Try unreliable_function then retry it in case of failure.
+
+    Optional Keyword Arguments:
+        max_retries:        number of retries after which GiveUpRetryError will be raised
+        max_sleep:          cumulated sleep (backoff) after which GiveUpRetryError will be raised
+        on_retry:           function to invoke _before_ each retry
+        init_backoff:       initial backoff that will potentially increase afterwards
+        backoff_multiplier: multiplication factor between consecutive backoffs
+                            set it to  1 for constant backoff
+                            set it to >1 for exponential backoff
+
+    Returns:
+        Result of unreliable_function if its invocations eventually succeed.
+        Otherwise raise GiveUpRetryError with the last error set as its __cause__
+    """
     _check_input_max_retries(max_retries)
     _check_input_backoff_multiplier(backoff_multiplier)
     nb_retries = 0
