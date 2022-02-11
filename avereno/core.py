@@ -19,6 +19,7 @@ def retry(
     ),
     init_backoff=timedelta(seconds=1),
     backoff_multiplier=2,
+    **kwargs
 ) -> T:
     """Try unreliable_function then retry it in case of failure.
 
@@ -30,6 +31,7 @@ def retry(
         backoff_multiplier: multiplication factor between consecutive backoffs
                             set it to  1 for constant backoff
                             set it to >1 for exponential backoff
+        **kwargs any argument to send in the target function
 
     Returns:
         Result of unreliable_function if its invocations eventually succeed.
@@ -41,7 +43,7 @@ def retry(
     backoff_in_seconds = init_backoff.total_seconds()
     while True:
         try:
-            return unreliable_function()
+            return unreliable_function(**kwargs)
         except Exception as e:
             nb_retries += 1
             _check_giveup_max_retries(max_retries, nb_retries, e)
