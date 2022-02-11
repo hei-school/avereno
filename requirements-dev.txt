@@ -1,2 +1,6 @@
 pytest
 pytest-cov
+pyyaml
+setuptools
+wheel
+twine
