@@ -56,8 +56,6 @@ jobs:
           echo "nxc_version=${{ steps.read-old-version.outputs.version }}" >> $GITHUB_ENV
           git checkout -- version.yml
         fi
-
-
     #######################################################
     ################ RELEASE TO PYPI ######################
     #######################################################
