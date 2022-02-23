@@ -31,7 +31,7 @@ def retry(
         backoff_multiplier: multiplication factor between consecutive backoffs
                             set it to  1 for constant backoff
                             set it to >1 for exponential backoff
-        **kwargs any argument to send in the target function
+        **kwargs: any argument to send in the target function
 
     Returns:
         Result of unreliable_function if its invocations eventually succeed.
